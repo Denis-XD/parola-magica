@@ -1,0 +1,52 @@
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.star {
+  font-size: 2.5rem;
+  opacity: 0;
+  animation: starAppear 0.6s ease-out forwards;
+}
+
+.star.filled {
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  animation: starAppear 0.6s ease-out forwards, starGlow 2s ease-in-out infinite;
+}
+
+.star.empty {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+@keyframes starAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(180deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes starGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
+  }
+}
+
+@media (max-width: 768px) {
+  .star {
+    font-size: 2rem;
+  }
+}

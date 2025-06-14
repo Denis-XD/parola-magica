@@ -1,0 +1,352 @@
+.landing-page {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.landing-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.landing-logo {
+  margin-bottom: 20px;
+}
+
+.logo-image {
+  max-width: 250px;
+  height: auto;
+}
+
+.landing-header {
+  margin-bottom: 30px;
+}
+
+.landing-header h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.translation-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
+  font-style: italic;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.project-info {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  backdrop-filter: blur(5px);
+}
+
+.authors-section {
+  margin-bottom: 25px;
+}
+
+.authors-section h3 {
+  color: var(--text);
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.authors-names {
+  color: var(--secondary);
+  font-weight: bold;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.subject-section {
+  margin-bottom: 25px;
+}
+
+.subject-section h3 {
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.subject-section span {
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+.university-section h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.landing-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.landing-button {
+  padding: 15px 40px;
+  border: none;
+  border-radius: 25px;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+}
+
+.button-translation {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.start-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: white;
+  border: 3px solid #fff;
+}
+
+.start-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.instructions-button {
+  background: linear-gradient(135deg, #4ecdc4 0%, #26a69a 100%);
+  color: white;
+  border: 3px solid #fff;
+}
+
+.instructions-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+}
+
+/* Instructions Modal */
+.instructions-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.instructions-modal {
+  background-color: white;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 2px solid #f0f0f0;
+  background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
+  color: white;
+  border-radius: 20px 20px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.8rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-content {
+  padding: 25px;
+}
+
+.age-info {
+  background: linear-gradient(135deg, var(--accent) 0%, #ffb74d 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.age-info h3 {
+  margin: 0;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.3rem;
+}
+
+.instructions-content h3 {
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.4rem;
+}
+
+.intro-text {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  border-left: 4px solid var(--secondary);
+}
+
+.instruction-section {
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+}
+
+.instruction-section h4 {
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.2rem;
+}
+
+.instruction-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instruction-section li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .landing-header h1 {
+    font-size: 2rem;
+  }
+
+  .translation-subtitle {
+    font-size: 1rem;
+  }
+
+  .project-info {
+    padding: 20px;
+  }
+
+  .authors-names {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .landing-buttons {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .landing-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
+
+  .button-translation {
+    font-size: 0.8rem;
+  }
+
+  .instructions-modal {
+    margin: 10px;
+    max-height: 90vh;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .instruction-section {
+    padding: 15px;
+  }
+
+  .logo-image {
+    max-width: 150px;
+  }
+}

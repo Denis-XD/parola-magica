@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Nunito:wght@400;600;700&display=swap");
+
+:root {
+  --primary: #ff6b6b;
+  --secondary: #4ecdc4;
+  --accent: #ffd166;
+  --background: #f7fff7;
+  --text: #2a2d34;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Bubblegum Sans", cursive;
+}
+
+button {
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.locked {
+  filter: grayscale(100%) brightness(40%);
+  pointer-events: none;
+}
+
+.unlocked {
+  filter: none;
+  cursor: grab;
+}
+
+.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 10px;
+  }
+}
