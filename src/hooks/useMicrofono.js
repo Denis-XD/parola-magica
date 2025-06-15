@@ -22,12 +22,13 @@ export function useMicrofono(language = "it-IT") {
       .then(() => {
         resetTranscript();
         setResultado("");
-        console.log("Iniciando reconocimiento...");
         SpeechRecognition.startListening({
           language: "es-ES",
           continuous: false,
         });
-        console.log("Reconocimiento iniciado");
+        setTimeout(() => {
+          evaluar(); // fuerza el stop
+        }, 5000);
       })
       .catch((err) => {
         alert("El acceso al micrófono fue denegado o falló.");
