@@ -23,7 +23,7 @@ export function useMicrofono(language = "it-IT") {
         resetTranscript();
         setResultado("");
         SpeechRecognition.startListening({
-          language: "es-ES",
+          language: "it-IT",
           continuous: false,
         });
         setTimeout(() => {
