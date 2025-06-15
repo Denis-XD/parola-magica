@@ -1,46 +1,60 @@
-import { useState, useEffect } from "react";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
+import { useEffect, useRef, useState } from "react";
 
 export function useMicrofono(language = "it-IT") {
-  const { transcript, resetTranscript } = useSpeechRecognition();
   const [resultado, setResultado] = useState("");
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
-    console.log("transcript:", transcript);
-  }, [transcript]);
+    // Verifica compatibilidad
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  const start = () => {
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    if (!SpeechRecognition) {
       alert("Este navegador no soporta reconocimiento de voz.");
       return;
     }
 
+    const recognition = new SpeechRecognition();
+    recognition.lang = language;
+    recognition.interimResults = false; // no mostrar resultados parciales
+    recognition.continuous = false; // no continuar escuchando
+
+    recognition.onresult = (event) => {
+      const texto = event.results[0][0].transcript;
+      console.log("Transcripción:", texto);
+      setResultado(texto.toLowerCase());
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Error de reconocimiento:", event.error);
+    };
+
+    recognitionRef.current = recognition;
+  }, [language]);
+
+  const start = () => {
+    if (!recognitionRef.current) return;
+
+    setResultado("");
+
+    // Solicitar permiso explícito
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(() => {
-        resetTranscript();
-        setResultado("");
-        SpeechRecognition.startListening({
-          language: "it-IT",
-          continuous: false,
-        });
-        setTimeout(() => {
-          evaluar(); // fuerza el stop
-        }, 5000);
+        recognitionRef.current.start();
+        console.log("🎤 Escuchando...");
       })
       .catch((err) => {
-        alert("El acceso al micrófono fue denegado o falló.");
-        console.error("Error al obtener el micrófono:", err);
+        alert("No se pudo acceder al micrófono.");
+        console.error(err);
       });
   };
 
   const evaluar = () => {
-    SpeechRecognition.stopListening();
-    const texto = transcript.toLowerCase();
-    setResultado(texto);
-    return texto;
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    return resultado;
   };
 
   return {
