@@ -362,44 +362,6 @@
   color: var(--text) !important;
 }
 
-@media (max-width: 768px) {
-  .items-grid,
-  .drop-zones {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .game-timer {
-    position: static;
-    margin-bottom: 20px;
-    width: fit-content;
-  }
-
-  .section-title h2 {
-    font-size: 1.3rem;
-  }
-
-  .section-subtitle {
-    font-size: 0.8rem;
-  }
-
-  .finish-button {
-    font-size: 1rem;
-    padding: 10px 25px;
-  }
-
-  .button-translation {
-    font-size: 0.8rem;
-  }
-
-  .feedback-container .feedback-main {
-    font-size: 1.1rem;
-  }
-
-  .feedback-container .feedback-translation {
-    font-size: 0.9rem;
-  }
-}
-
 .lock-overlay {
   position: absolute;
   top: 0;
@@ -416,4 +378,270 @@
 .lock-icon {
   font-size: 2rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Carousel Styles for Mobile */
+@media (max-width: 768px) {
+  .game-content {
+    padding: 10px;
+  }
+
+  .game-area {
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .items-container,
+  .drop-container {
+    padding: 15px;
+  }
+
+  .game-timer {
+    position: static;
+    margin-bottom: 15px;
+    width: fit-content;
+    padding: 4px 12px;
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    margin-bottom: 15px;
+  }
+
+  .section-title h2 {
+    font-size: 1.1rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .finish-button {
+    font-size: 0.9rem;
+    padding: 8px 20px;
+  }
+
+  .button-translation {
+    font-size: 0.75rem;
+  }
+
+  .feedback-container .feedback-main {
+    font-size: 1rem;
+  }
+
+  .feedback-container .feedback-translation {
+    font-size: 0.85rem;
+  }
+
+  /* Carousel for Items */
+  .items-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 15px;
+    padding: 5px 15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .items-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .item-card {
+    flex: 0 0 200px;
+    scroll-snap-align: center;
+    transform: scale(0.85);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .item-card:hover {
+    transform: scale(0.9);
+  }
+
+  .item-card.center-item {
+    transform: scale(1);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.25);
+    border: 2px solid var(--primary);
+  }
+
+  .item-card.center-item:hover {
+    transform: scale(1.05);
+  }
+
+  .item-image {
+    height: 100px;
+  }
+
+  .item-controls {
+    padding: 8px;
+  }
+
+  .mic-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  /* Carousel for Drop Zones */
+  .drop-zones {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 15px;
+    padding: 5px 15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drop-zones::-webkit-scrollbar {
+    display: none;
+  }
+
+  .drop-zone {
+    flex: 0 0 200px;
+    height: 120px;
+    scroll-snap-align: center;
+    transform: scale(0.85);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    border: 2px dashed #ccc;
+  }
+
+  .drop-zone.center-zone {
+    transform: scale(1);
+    border-color: var(--secondary);
+    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.25);
+  }
+
+  .drop-zone:hover {
+    transform: scale(0.9);
+  }
+
+  .drop-zone.center-zone:hover {
+    transform: scale(1.05);
+  }
+
+  .drop-zone.filled {
+    border: 2px solid var(--secondary);
+    background-color: rgba(78, 205, 196, 0.2);
+  }
+
+  .drop-zone-label {
+    bottom: 8px;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+
+  /* Carousel Indicators */
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .carousel-dot.active {
+    background-color: var(--primary);
+    transform: scale(1.2);
+  }
+
+  /* Swipe Hint Animation */
+  .swipe-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: bold;
+    animation: swipeHint 2s ease-in-out infinite;
+  }
+
+  @keyframes swipeHint {
+    0%,
+    100% {
+      opacity: 0.6;
+      transform: translateX(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(5px);
+    }
+  }
+
+  .swipe-hint-icon {
+    font-size: 1rem;
+    animation: swipeIcon 2s ease-in-out infinite;
+  }
+
+  @keyframes swipeIcon {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(8px);
+    }
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .game-content {
+    padding: 8px;
+  }
+
+  .game-area {
+    gap: 12px;
+    margin-top: 25px;
+  }
+
+  .items-container,
+  .drop-container {
+    padding: 12px;
+  }
+
+  .item-card {
+    flex: 0 0 180px;
+  }
+
+  .drop-zone {
+    flex: 0 0 180px;
+    height: 100px;
+  }
+
+  .item-image {
+    height: 85px;
+  }
+
+  .section-title h2 {
+    font-size: 1rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .swipe-hint {
+    font-size: 0.65rem;
+  }
+
+  .mic-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .mic-button svg {
+    width: 16px;
+    height: 16px;
+  }
 }

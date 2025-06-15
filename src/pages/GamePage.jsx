@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useMicrofono } from "../hooks/useMicrofono";
 import { reproducirPalabra } from "../utils/voz";
 import { useGameContext } from "../context/GameContext";
-import { Mic, Check, X, Clock, Ear } from "lucide-react";
+import { Mic, Check, X, Clock, Ear, ChevronRight } from "lucide-react";
 import "./GamePage.css";
 import Countdown from "../components/Countdown";
 
@@ -58,10 +58,14 @@ const GamePage = () => {
   const [isListening, setIsListening] = useState(false);
   const [showCountdown, setShowCountdown] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState(2); // Start at middle item (index 2)
+  const [currentDropIndex, setCurrentDropIndex] = useState(2); // Start at middle drop zone
 
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
   const timerRef = useRef(null);
+  const itemsScrollRef = useRef(null);
+  const dropScrollRef = useRef(null);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -92,6 +96,72 @@ const GamePage = () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [category, navigate, gameStarted]);
+
+  // Scroll to center item on mobile when game starts
+  useEffect(() => {
+    if (gameStarted && window.innerWidth <= 768) {
+      setTimeout(() => {
+        scrollToCenter();
+      }, 500);
+    }
+  }, [gameStarted]);
+
+  // Handle scroll events for carousel indicators
+  useEffect(() => {
+    const handleItemsScroll = () => {
+      if (itemsScrollRef.current && window.innerWidth <= 768) {
+        const scrollLeft = itemsScrollRef.current.scrollLeft;
+        const itemWidth = 300; // 280px + 20px gap
+        const index = Math.round(scrollLeft / itemWidth);
+        setCurrentItemIndex(Math.max(0, Math.min(4, index)));
+      }
+    };
+
+    const handleDropScroll = () => {
+      if (dropScrollRef.current && window.innerWidth <= 768) {
+        const scrollLeft = dropScrollRef.current.scrollLeft;
+        const itemWidth = 300; // 280px + 20px gap
+        const index = Math.round(scrollLeft / itemWidth);
+        setCurrentDropIndex(Math.max(0, Math.min(4, index)));
+      }
+    };
+
+    const itemsContainer = itemsScrollRef.current;
+    const dropContainer = dropScrollRef.current;
+
+    if (itemsContainer) {
+      itemsContainer.addEventListener("scroll", handleItemsScroll);
+    }
+    if (dropContainer) {
+      dropContainer.addEventListener("scroll", handleDropScroll);
+    }
+
+    return () => {
+      if (itemsContainer) {
+        itemsContainer.removeEventListener("scroll", handleItemsScroll);
+      }
+      if (dropContainer) {
+        dropContainer.removeEventListener("scroll", handleDropScroll);
+      }
+    };
+  }, []);
+
+  const scrollToCenter = () => {
+    if (itemsScrollRef.current) {
+      const itemWidth = 300; // 280px + 20px gap
+      itemsScrollRef.current.scrollTo({
+        left: itemWidth * 2, // Scroll to 3rd item (index 2)
+        behavior: "smooth",
+      });
+    }
+    if (dropScrollRef.current) {
+      const itemWidth = 300;
+      dropScrollRef.current.scrollTo({
+        left: itemWidth * 2,
+        behavior: "smooth",
+      });
+    }
+  };
 
   // Check speech recognition result
   useEffect(() => {
@@ -230,12 +300,16 @@ const GamePage = () => {
                 (Escucha y pronuncia las palabras)
               </p>
             </div>
-            <div className="items-grid">
-              {items.map((item) => (
+            <div className="items-grid" ref={itemsScrollRef}>
+              {items.map((item, index) => (
                 <div
                   key={item.id}
                   className={`item-card ${
                     isItemPlaced(item.id) ? "placed" : ""
+                  } ${
+                    window.innerWidth <= 768 && index === currentItemIndex
+                      ? "center-item"
+                      : ""
                   }`}
                   draggable={
                     unlockedItems.includes(item.id) && !isItemPlaced(item.id)
@@ -273,6 +347,24 @@ const GamePage = () => {
                 </div>
               ))}
             </div>
+            {window.innerWidth <= 768 && (
+              <>
+                <div className="carousel-indicators">
+                  {items.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`carousel-dot ${
+                        index === currentItemIndex ? "active" : ""
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="swipe-hint">
+                  <span>Desliza para ver más</span>
+                  <ChevronRight className="swipe-hint-icon" size={16} />
+                </div>
+              </>
+            )}
           </div>
 
           {feedback.show && (
@@ -304,12 +396,16 @@ const GamePage = () => {
                 (Arrastra las imágenes a su lugar correcto)
               </p>
             </div>
-            <div className="drop-zones">
-              {items.map((item) => (
+            <div className="drop-zones" ref={dropScrollRef}>
+              {items.map((item, index) => (
                 <div
                   key={item.id}
                   className={`drop-zone ${
                     dropZoneContents[item.id] ? "filled" : ""
+                  } ${
+                    window.innerWidth <= 768 && index === currentDropIndex
+                      ? "center-zone"
+                      : ""
                   }`}
                   onDragOver={(e) => handleDragOver(e, item.id)}
                   onDrop={(e) => handleDrop(e, item.id)}
@@ -328,6 +424,24 @@ const GamePage = () => {
                 </div>
               ))}
             </div>
+            {window.innerWidth <= 768 && (
+              <>
+                <div className="carousel-indicators">
+                  {items.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`carousel-dot ${
+                        index === currentDropIndex ? "active" : ""
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="swipe-hint">
+                  <span>Desliza para ver más</span>
+                  <ChevronRight className="swipe-hint-icon" size={16} />
+                </div>
+              </>
+            )}
           </div>
 
           <div className="game-actions">
