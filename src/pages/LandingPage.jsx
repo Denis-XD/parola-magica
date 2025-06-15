@@ -39,8 +39,7 @@ const LandingPage = () => {
         </div>
 
         <div className="landing-header">
-          <h1>¡Bienvenido a Parola Magica!</h1>
-          <p className="translation-subtitle">(Palabra Mágica)</p>
+          <h1>¡Bienvenido a Parola Magica! - Palabra Mágica</h1>
         </div>
 
         <div className="project-info">
@@ -55,7 +54,7 @@ const LandingPage = () => {
 
           <div className="subject-section">
             <h3>
-              Materia: <span>Taller de Recursos</span>
+              Materia: <span>Linguistica</span>
             </h3>
           </div>
 
@@ -145,10 +144,11 @@ const LandingPage = () => {
                   <h4>Arrastra las imágenes</h4>
                   <ul>
                     <li>
-                      Cuando el niño desbloquee la imagen debe arrastrar la
-                      imagen hacia una de las palabras escritas que aparecen en
-                      la parte inferior correspondiente a cada una de las
-                      imágenes.
+                      Cuando el niño desbloquee una imagen, deberá arrastrarla
+                      hacia la palabra correspondiente que aparece en la parte
+                      inferior. Es importante tener en cuenta que, una vez
+                      colocada, la imagen quedará fija en ese lugar y no podrá
+                      ser movida nuevamente.
                     </li>
                     <li>
                       Las palabras de la parte inferior no aparecen en el mismo
@@ -179,6 +179,21 @@ const LandingPage = () => {
                       Al finalizar el juego hay un historial donde el niño puede
                       ir comparando cuál fue su menor tiempo y cuántas acertó en
                       cada juego.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="note-section">
+                  <h4>Nota:</h4>
+                  <ul>
+                    <li>
+                      En dispositivo móvil toque y mantenga presionado en la
+                      parte inferior de la figura para arrastrarla al lugar
+                      correcto.
+                    </li>
+                    <li>
+                      Al usar el micrófono, hable de forma clara, rápida y con
+                      buena pronunciación.
                     </li>
                   </ul>
                 </div>

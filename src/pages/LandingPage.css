@@ -300,6 +300,42 @@
   line-height: 1.5;
 }
 
+.note-section {
+  margin-bottom: 25px;
+  background-color: #fff3cd;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #ffc107;
+  border: 2px solid #ffc107;
+}
+
+.note-section h4 {
+  color: #856404;
+  margin-bottom: 15px;
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-section h4::before {
+  content: "⚠️";
+  font-size: 1.1rem;
+}
+
+.note-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.note-section li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: #856404;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .landing-header h1 {
     font-size: 2rem;
@@ -342,7 +378,8 @@
     padding: 20px;
   }
 
-  .instruction-section {
+  .instruction-section,
+  .note-section {
     padding: 15px;
   }
 

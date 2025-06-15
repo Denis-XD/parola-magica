@@ -1,14 +1,14 @@
-import { createContext, useState, useContext, useEffect } from "react"
+import { createContext, useState, useContext, useEffect } from "react";
 
-const GameContext = createContext()
+const GameContext = createContext();
 
-export const useGameContext = () => useContext(GameContext)
+export const useGameContext = () => useContext(GameContext);
 
 export const GameProvider = ({ children }) => {
   const [gameHistory, setGameHistory] = useState(() => {
-    const saved = localStorage.getItem("gameHistory")
-    return saved ? JSON.parse(saved) : []
-  })
+    const saved = localStorage.getItem("gameHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const [currentGame, setCurrentGame] = useState({
     category: "",
@@ -16,11 +16,12 @@ export const GameProvider = ({ children }) => {
     endTime: null,
     score: 0,
     totalItems: 5,
-  })
+    duration: 0,
+  });
 
   useEffect(() => {
-    localStorage.setItem("gameHistory", JSON.stringify(gameHistory))
-  }, [gameHistory])
+    localStorage.setItem("gameHistory", JSON.stringify(gameHistory));
+  }, [gameHistory]);
 
   const startGame = (category) => {
     setCurrentGame({
@@ -29,23 +30,31 @@ export const GameProvider = ({ children }) => {
       endTime: null,
       score: 0,
       totalItems: 5,
-    })
-  }
+      duration: 0,
+    });
+  };
 
-  const endGame = (score) => {
-    const endTime = new Date()
+  const endGame = (score, durationInSeconds = null) => {
+    const endTime = new Date();
+    let finalDuration = durationInSeconds;
+
+    // If no duration provided, calculate from start time
+    if (finalDuration === null) {
+      finalDuration = Math.floor((endTime - currentGame.startTime) / 1000);
+    }
+
     const updatedGame = {
       ...currentGame,
       endTime,
       score,
-      duration: (endTime - currentGame.startTime) / 1000, // in seconds
-    }
+      duration: finalDuration, // duration in seconds
+    };
 
-    setCurrentGame(updatedGame)
-    setGameHistory((prev) => [updatedGame, ...prev])
+    setCurrentGame(updatedGame);
+    setGameHistory((prev) => [updatedGame, ...prev]);
 
-    return updatedGame
-  }
+    return updatedGame;
+  };
 
   return (
     <GameContext.Provider
@@ -58,5 +67,5 @@ export const GameProvider = ({ children }) => {
     >
       {children}
     </GameContext.Provider>
-  )
-}
+  );
+};

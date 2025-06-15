@@ -46,6 +46,7 @@ const GamePage = () => {
   const { resultado, start, evaluar } = useMicrofono("it-IT");
 
   const [items, setItems] = useState([]);
+  const [dropZoneItems, setDropZoneItems] = useState([]);
   const [unlockedItems, setUnlockedItems] = useState([]);
   const [dropZoneContents, setDropZoneContents] = useState({}); // {zoneId: itemId}
   const [listeningFor, setListeningFor] = useState(null);
@@ -64,6 +65,7 @@ const GamePage = () => {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
   const timerRef = useRef(null);
+  const gameStartTimeRef = useRef(null);
   const itemsScrollRef = useRef(null);
   const dropScrollRef = useRef(null);
 
@@ -79,23 +81,43 @@ const GamePage = () => {
       return;
     }
 
-    // Shuffle items
+    // Shuffle items for top section
     const shuffledItems = [...gameData[category]].sort(
       () => Math.random() - 0.5
     );
     setItems(shuffledItems);
 
-    // Start timer only when game has started
+    // Create a different shuffle for drop zones
+    const shuffledDropZones = [...gameData[category]].sort(
+      () => Math.random() - 0.5
+    );
+    setDropZoneItems(shuffledDropZones);
+  }, [category, navigate]);
+
+  // Timer management - simplified
+  useEffect(() => {
     if (gameStarted) {
+      // Set start time
+      gameStartTimeRef.current = Date.now();
+
+      // Start timer
       timerRef.current = setInterval(() => {
-        setTimer((prev) => prev + 1);
+        const currentTime = Date.now();
+        const elapsedSeconds = Math.floor(
+          (currentTime - gameStartTimeRef.current) / 1000
+        );
+        setTimer(elapsedSeconds);
       }, 1000);
     }
 
+    // Cleanup function
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [category, navigate, gameStarted]);
+  }, [gameStarted]);
 
   // Scroll to center item on mobile when game starts
   useEffect(() => {
@@ -111,7 +133,7 @@ const GamePage = () => {
     const handleItemsScroll = () => {
       if (itemsScrollRef.current && window.innerWidth <= 768) {
         const scrollLeft = itemsScrollRef.current.scrollLeft;
-        const itemWidth = 300; // 280px + 20px gap
+        const itemWidth = 215; // 200px + 15px gap
         const index = Math.round(scrollLeft / itemWidth);
         setCurrentItemIndex(Math.max(0, Math.min(4, index)));
       }
@@ -120,7 +142,7 @@ const GamePage = () => {
     const handleDropScroll = () => {
       if (dropScrollRef.current && window.innerWidth <= 768) {
         const scrollLeft = dropScrollRef.current.scrollLeft;
-        const itemWidth = 300; // 280px + 20px gap
+        const itemWidth = 215; // 200px + 15px gap
         const index = Math.round(scrollLeft / itemWidth);
         setCurrentDropIndex(Math.max(0, Math.min(4, index)));
       }
@@ -148,14 +170,14 @@ const GamePage = () => {
 
   const scrollToCenter = () => {
     if (itemsScrollRef.current) {
-      const itemWidth = 300; // 280px + 20px gap
+      const itemWidth = 215; // 200px + 15px gap
       itemsScrollRef.current.scrollTo({
         left: itemWidth * 2, // Scroll to 3rd item (index 2)
         behavior: "smooth",
       });
     }
     if (dropScrollRef.current) {
-      const itemWidth = 300;
+      const itemWidth = 215;
       dropScrollRef.current.scrollTo({
         left: itemWidth * 2,
         behavior: "smooth",
@@ -253,7 +275,17 @@ const GamePage = () => {
   };
 
   const handleFinish = () => {
-    clearInterval(timerRef.current);
+    // Stop timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Calculate final time
+    const endTime = Date.now();
+    const finalDuration = Math.floor(
+      (endTime - gameStartTimeRef.current) / 1000
+    );
 
     // Calculate correct matches
     let correctMatches = 0;
@@ -263,7 +295,7 @@ const GamePage = () => {
       }
     });
 
-    const gameResult = endGame(correctMatches);
+    const gameResult = endGame(correctMatches, finalDuration);
     navigate("/result", { state: { gameResult } });
   };
 
@@ -397,7 +429,7 @@ const GamePage = () => {
               </p>
             </div>
             <div className="drop-zones" ref={dropScrollRef}>
-              {items.map((item, index) => (
+              {dropZoneItems.map((item, index) => (
                 <div
                   key={item.id}
                   className={`drop-zone ${
@@ -427,7 +459,7 @@ const GamePage = () => {
             {window.innerWidth <= 768 && (
               <>
                 <div className="carousel-indicators">
-                  {items.map((_, index) => (
+                  {dropZoneItems.map((_, index) => (
                     <div
                       key={index}
                       className={`carousel-dot ${
