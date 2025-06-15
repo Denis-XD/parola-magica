@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 
 export function useMicrofono(language = "it-IT") {
   const [resultado, setResultado] = useState("");
+  const [escuchando, setEscuchando] = useState(false);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
-    // Verifica compatibilidad
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -16,17 +16,27 @@ export function useMicrofono(language = "it-IT") {
 
     const recognition = new SpeechRecognition();
     recognition.lang = language;
-    recognition.interimResults = false; // no mostrar resultados parciales
-    recognition.continuous = false; // no continuar escuchando
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+      setEscuchando(true);
+      console.log("🎤 Reconocimiento iniciado");
+    };
 
     recognition.onresult = (event) => {
       const texto = event.results[0][0].transcript;
-      console.log("Transcripción:", texto);
+      console.log("📝 Transcripción:", texto);
       setResultado(texto.toLowerCase());
     };
 
     recognition.onerror = (event) => {
-      console.error("Error de reconocimiento:", event.error);
+      console.error("❌ Error de reconocimiento:", event.error);
+    };
+
+    recognition.onend = () => {
+      setEscuchando(false);
+      console.log("🛑 Reconocimiento detenido");
     };
 
     recognitionRef.current = recognition;
@@ -37,12 +47,14 @@ export function useMicrofono(language = "it-IT") {
 
     setResultado("");
 
-    // Solicitar permiso explícito
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(() => {
-        recognitionRef.current.start();
-        console.log("🎤 Escuchando...");
+        // Espera mínima en móviles para asegurar activación
+        setTimeout(() => {
+          recognitionRef.current.start();
+          console.log("🎤 Escuchando...");
+        }, 200); // puedes probar subirlo a 500ms si no activa
       })
       .catch((err) => {
         alert("No se pudo acceder al micrófono.");
@@ -51,7 +63,7 @@ export function useMicrofono(language = "it-IT") {
   };
 
   const evaluar = () => {
-    if (recognitionRef.current) {
+    if (recognitionRef.current && escuchando) {
       recognitionRef.current.stop();
     }
     return resultado;
@@ -61,5 +73,6 @@ export function useMicrofono(language = "it-IT") {
     resultado,
     start,
     evaluar,
+    escuchando,
   };
 }
