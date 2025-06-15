@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -7,7 +7,16 @@ export function useMicrofono(language = "it-IT") {
   const { transcript, resetTranscript } = useSpeechRecognition();
   const [resultado, setResultado] = useState("");
 
+  useEffect(() => {
+    console.log("transcript:", transcript);
+  }, [transcript]);
+
   const start = () => {
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      alert("Este navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(() => {
