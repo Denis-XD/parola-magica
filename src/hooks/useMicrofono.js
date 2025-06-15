@@ -13,7 +13,10 @@ export function useMicrofono(language = "it-IT") {
       .then(() => {
         resetTranscript();
         setResultado("");
-        SpeechRecognition.startListening({ language: "it-IT" });
+        SpeechRecognition.startListening({
+          language: "it-IT",
+          continuous: false,
+        });
       })
       .catch((err) => {
         alert("El acceso al micrófono fue denegado o falló.");
