@@ -24,7 +24,7 @@ export function useMicrofono(language = "it-IT") {
         setResultado("");
         console.log("Iniciando reconocimiento...");
         SpeechRecognition.startListening({
-          language: "it-IT",
+          language: "es-ES",
           continuous: false,
         });
         console.log("Reconocimiento iniciado");
