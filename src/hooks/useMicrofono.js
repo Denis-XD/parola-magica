@@ -17,7 +17,8 @@ export function useMicrofono(language = "it-IT") {
     const recognition = new SpeechRecognition();
     recognition.lang = language;
     recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.continuous = true; // importante en móvil
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
       setEscuchando(true);
@@ -25,7 +26,7 @@ export function useMicrofono(language = "it-IT") {
     };
 
     recognition.onresult = (event) => {
-      const texto = event.results[0][0].transcript;
+      const texto = event.results[event.results.length - 1][0].transcript;
       console.log("📝 Transcripción:", texto);
       setResultado(texto.toLowerCase());
     };
@@ -47,19 +48,11 @@ export function useMicrofono(language = "it-IT") {
 
     setResultado("");
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(() => {
-        // Espera mínima en móviles para asegurar activación
-        setTimeout(() => {
-          recognitionRef.current.start();
-          console.log("🎤 Escuchando...");
-        }, 200); // puedes probar subirlo a 500ms si no activa
-      })
-      .catch((err) => {
-        alert("No se pudo acceder al micrófono.");
-        console.error(err);
-      });
+    try {
+      recognitionRef.current.start(); // no getUserMedia
+    } catch (err) {
+      console.error("❗️ Error al iniciar reconocimiento:", err);
+    }
   };
 
   const evaluar = () => {
