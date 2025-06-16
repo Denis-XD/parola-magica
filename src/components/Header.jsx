@@ -21,15 +21,18 @@ const Header = () => {
       case "colori":
         return {
           title: "Colori",
-          objective: "Practica /r/, /s/, vocales abiertas",
+          objective: "Practica sonidos /r/, /s/",
         };
       case "oggetti":
         return {
           title: "Oggetti della casa",
-          objective: "Practica /k/, /l/, /r/, /s/",
+          objective: "Practica sonidos /k/, /l/, /r/, /s/",
         };
       case "vestiti":
-        return { title: "Vestiti", objective: "Refuerza /l/, /r/, /tʃ/, /z/" };
+        return {
+          title: "Vestiti",
+          objective: "Practica sonidos /l/, /r/, /tʃ/, /z/",
+        };
       default:
         return { title: "", objective: "" };
     }

@@ -39,7 +39,7 @@ const LandingPage = () => {
         </div>
 
         <div className="landing-header">
-          <h1>¡Bienvenido a Parola Magica! - Palabra Mágica</h1>
+          <h1>¡Bienvenido a Parola Magica! - ¡Palabra Mágica!</h1>
         </div>
 
         <div className="project-info">
@@ -54,7 +54,7 @@ const LandingPage = () => {
 
           <div className="subject-section">
             <h3>
-              Materia: <span>Linguistica</span>
+              Materia: <span>Taller De Recursos</span>
             </h3>
           </div>
 
