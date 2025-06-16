@@ -189,7 +189,8 @@ const LandingPage = () => {
                     <li>
                       En dispositivo móvil toque y mantenga presionado en la
                       parte inferior de la figura para arrastrarla al lugar
-                      correcto.
+                      correcto. Antes de arrastrar una imagen, busque primero la
+                      palabra que le corresponde.
                     </li>
                     <li>
                       Al usar el micrófono, hable de forma clara, rápida y con
