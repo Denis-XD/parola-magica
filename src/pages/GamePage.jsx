@@ -62,6 +62,7 @@ const GamePage = () => {
   const [currentItemIndex, setCurrentItemIndex] = useState(2); // Start at middle item (index 2)
   const [currentDropIndex, setCurrentDropIndex] = useState(2); // Start at middle drop zone
   const [isDragging, setIsDragging] = useState(false);
+  const [draggedElement, setDraggedElement] = useState(null);
 
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
@@ -70,7 +71,8 @@ const GamePage = () => {
   const itemsScrollRef = useRef(null);
   const dropScrollRef = useRef(null);
   const autoScrollRef = useRef(null);
-  const dragPositionRef = useRef({ x: 0, y: 0 });
+  const dragStartPos = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -173,30 +175,27 @@ const GamePage = () => {
 
   // Auto-scroll functionality
   const startAutoScroll = (direction) => {
-    if (autoScrollRef.current) return; // Already scrolling
+    if (autoScrollRef.current || !dropScrollRef.current) return;
 
-    const scrollSpeed = 3; // pixels per frame
+    const scrollSpeed = 4;
     const scroll = () => {
-      if (dropScrollRef.current && isDragging) {
-        const currentScroll = dropScrollRef.current.scrollLeft;
-        const maxScroll =
-          dropScrollRef.current.scrollWidth - dropScrollRef.current.clientWidth;
+      if (!isDraggingRef.current || !dropScrollRef.current) {
+        stopAutoScroll();
+        return;
+      }
 
-        if (direction === "left" && currentScroll > 0) {
-          dropScrollRef.current.scrollLeft = Math.max(
-            0,
-            currentScroll - scrollSpeed
-          );
-        } else if (direction === "right" && currentScroll < maxScroll) {
-          dropScrollRef.current.scrollLeft = Math.min(
-            maxScroll,
-            currentScroll + scrollSpeed
-          );
-        }
+      const container = dropScrollRef.current;
+      const currentScroll = container.scrollLeft;
+      const maxScroll = container.scrollWidth - container.clientWidth;
 
-        if (isDragging) {
-          autoScrollRef.current = requestAnimationFrame(scroll);
-        }
+      if (direction === "left" && currentScroll > 0) {
+        container.scrollLeft = Math.max(0, currentScroll - scrollSpeed);
+      } else if (direction === "right" && currentScroll < maxScroll) {
+        container.scrollLeft = Math.min(maxScroll, currentScroll + scrollSpeed);
+      }
+
+      if (isDraggingRef.current) {
+        autoScrollRef.current = requestAnimationFrame(scroll);
       }
     };
     autoScrollRef.current = requestAnimationFrame(scroll);
@@ -209,29 +208,31 @@ const GamePage = () => {
     }
   };
 
-  const handleDragPosition = (clientX, clientY) => {
-    if (!dropScrollRef.current || window.innerWidth > 768) return;
+  const checkAutoScroll = (clientX) => {
+    if (
+      !dropScrollRef.current ||
+      window.innerWidth > 768 ||
+      !isDraggingRef.current
+    )
+      return;
 
-    const dropContainer = dropScrollRef.current;
-    const rect = dropContainer.getBoundingClientRect();
+    const container = dropScrollRef.current;
+    const rect = container.getBoundingClientRect();
     const relativeX = clientX - rect.left;
     const containerWidth = rect.width;
 
-    // Define scroll zones (20% on each side)
-    const scrollZoneWidth = containerWidth * 0.2;
-    const leftZone = scrollZoneWidth;
-    const rightZone = containerWidth - scrollZoneWidth;
+    // Define scroll zones (25% on each side)
+    const scrollZoneWidth = containerWidth * 0.25;
 
-    stopAutoScroll(); // Stop any existing auto-scroll
+    stopAutoScroll();
 
-    if (relativeX < leftZone) {
+    if (relativeX < scrollZoneWidth) {
       // Left scroll zone
       startAutoScroll("left");
-    } else if (relativeX > rightZone) {
+    } else if (relativeX > containerWidth - scrollZoneWidth) {
       // Right scroll zone
       startAutoScroll("right");
     }
-    // Center zone - no auto-scroll
   };
 
   const scrollToCenter = () => {
@@ -287,12 +288,12 @@ const GamePage = () => {
   };
 
   const handleItemClick = (itemId) => {
-    if (!gameStarted) return;
+    if (!gameStarted || isDraggingRef.current) return;
     reproducirPalabra(category, itemId);
   };
 
   const handleMicClick = (itemId) => {
-    if (!gameStarted) return;
+    if (!gameStarted || isDraggingRef.current) return;
     setListeningFor(itemId);
     setIsListening(true);
     start();
@@ -307,35 +308,32 @@ const GamePage = () => {
     return Object.values(dropZoneContents).includes(itemId);
   };
 
+  // Mouse/Desktop drag handlers
   const handleDragStart = (e, itemId) => {
-    if (!unlockedItems.includes(itemId) || isItemPlaced(itemId)) return;
+    if (!unlockedItems.includes(itemId) || isItemPlaced(itemId)) {
+      e.preventDefault();
+      return;
+    }
 
     dragItem.current = itemId;
     setIsDragging(true);
+    isDraggingRef.current = true;
     e.target.classList.add("dragging");
-
-    // Store initial position
-    dragPositionRef.current = {
-      x: e.clientX || (e.touches && e.touches[0].clientX) || 0,
-      y: e.clientY || (e.touches && e.touches[0].clientY) || 0,
-    };
   };
 
   const handleDragOver = (e, targetZoneId) => {
     e.preventDefault();
     dragOverItem.current = targetZoneId;
 
-    // Handle auto-scroll on drag over
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-    if (clientX && clientY) {
-      handleDragPosition(clientX, clientY);
+    // Check for auto-scroll
+    if (e.clientX) {
+      checkAutoScroll(e.clientX);
     }
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    isDraggingRef.current = false;
     stopAutoScroll();
 
     document.querySelectorAll(".dragging").forEach((el) => {
@@ -344,6 +342,7 @@ const GamePage = () => {
 
     dragItem.current = null;
     dragOverItem.current = null;
+    setDraggedElement(null);
   };
 
   const handleDrop = (e, targetZoneId) => {
@@ -352,7 +351,6 @@ const GamePage = () => {
     const draggedItemId = dragItem.current;
 
     if (draggedItemId && !dropZoneContents[targetZoneId]) {
-      // Place item in the drop zone
       setDropZoneContents((prev) => ({
         ...prev,
         [targetZoneId]: draggedItemId,
@@ -362,32 +360,51 @@ const GamePage = () => {
     handleDragEnd();
   };
 
-  // Touch event handlers for mobile devices
+  // Touch handlers for mobile
   const handleTouchStart = (e, itemId) => {
     if (!unlockedItems.includes(itemId) || isItemPlaced(itemId)) return;
 
-    dragItem.current = itemId;
-    setIsDragging(true);
+    // Prevent default only for draggable items
+    e.preventDefault();
 
     const touch = e.touches[0];
-    dragPositionRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-    };
+    dragStartPos.current = { x: touch.clientX, y: touch.clientY };
+    dragItem.current = itemId;
+    setDraggedElement(e.currentTarget);
+
+    // Small delay to distinguish between tap and drag
+    setTimeout(() => {
+      if (dragItem.current === itemId) {
+        setIsDragging(true);
+        isDraggingRef.current = true;
+        e.currentTarget.classList.add("dragging");
+      }
+    }, 150);
   };
 
   const handleTouchMove = (e) => {
-    if (!isDragging || !dragItem.current) return;
+    if (!isDraggingRef.current || !dragItem.current) return;
 
-    e.preventDefault(); // Prevent scrolling
+    e.preventDefault();
     const touch = e.touches[0];
 
-    // Handle auto-scroll
-    handleDragPosition(touch.clientX, touch.clientY);
+    // Check if we've moved enough to start dragging
+    const deltaX = Math.abs(touch.clientX - dragStartPos.current.x);
+    const deltaY = Math.abs(touch.clientY - dragStartPos.current.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      // Check for auto-scroll
+      checkAutoScroll(touch.clientX);
+    }
   };
 
   const handleTouchEnd = (e) => {
-    if (!isDragging || !dragItem.current) return;
+    if (!isDraggingRef.current || !dragItem.current) {
+      // Reset if it was just a tap
+      dragItem.current = null;
+      setDraggedElement(null);
+      return;
+    }
 
     const touch = e.changedTouches[0];
     const elementBelow = document.elementFromPoint(
@@ -413,6 +430,23 @@ const GamePage = () => {
 
     handleDragEnd();
   };
+
+  // Global touch move handler to prevent scrolling during drag
+  useEffect(() => {
+    const handleGlobalTouchMove = (e) => {
+      if (isDraggingRef.current) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("touchmove", handleGlobalTouchMove, {
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("touchmove", handleGlobalTouchMove);
+    };
+  }, []);
 
   const handleFinish = () => {
     // Stop timer
@@ -575,18 +609,7 @@ const GamePage = () => {
                 (Arrastra las imágenes a su lugar correcto)
               </p>
             </div>
-            <div
-              className="drop-zones"
-              ref={dropScrollRef}
-              onDragOver={(e) => {
-                e.preventDefault();
-                const clientX = e.clientX;
-                const clientY = e.clientY;
-                if (clientX && clientY) {
-                  handleDragPosition(clientX, clientY);
-                }
-              }}
-            >
+            <div className="drop-zones" ref={dropScrollRef}>
               {dropZoneItems.map((item, index) => (
                 <div
                   key={item.id}
