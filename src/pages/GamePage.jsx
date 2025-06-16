@@ -173,11 +173,10 @@ const GamePage = () => {
     };
   }, []);
 
-  // Auto-scroll functionality
-  const startAutoScroll = (direction) => {
-    if (autoScrollRef.current || !dropScrollRef.current) return;
+  // Auto-scroll functionality - IMPROVED VERSION
+  const startAutoScroll = (direction, speed = 3) => {
+    if (autoScrollRef.current) return;
 
-    const scrollSpeed = 4;
     const scroll = () => {
       if (!isDraggingRef.current || !dropScrollRef.current) {
         stopAutoScroll();
@@ -189,9 +188,9 @@ const GamePage = () => {
       const maxScroll = container.scrollWidth - container.clientWidth;
 
       if (direction === "left" && currentScroll > 0) {
-        container.scrollLeft = Math.max(0, currentScroll - scrollSpeed);
+        container.scrollLeft = Math.max(0, currentScroll - speed);
       } else if (direction === "right" && currentScroll < maxScroll) {
-        container.scrollLeft = Math.min(maxScroll, currentScroll + scrollSpeed);
+        container.scrollLeft = Math.min(maxScroll, currentScroll + speed);
       }
 
       if (isDraggingRef.current) {
@@ -208,7 +207,7 @@ const GamePage = () => {
     }
   };
 
-  const checkAutoScroll = (clientX) => {
+  const handleDragPosition = (clientX) => {
     if (
       !dropScrollRef.current ||
       window.innerWidth > 768 ||
@@ -221,18 +220,25 @@ const GamePage = () => {
     const relativeX = clientX - rect.left;
     const containerWidth = rect.width;
 
-    // Define scroll zones (25% on each side)
-    const scrollZoneWidth = containerWidth * 0.25;
+    // Define scroll zones - 30% on each side for better detection
+    const scrollZoneWidth = containerWidth * 0.3;
+    const centerZoneStart = scrollZoneWidth;
+    const centerZoneEnd = containerWidth - scrollZoneWidth;
 
     stopAutoScroll();
 
-    if (relativeX < scrollZoneWidth) {
-      // Left scroll zone
-      startAutoScroll("left");
-    } else if (relativeX > containerWidth - scrollZoneWidth) {
-      // Right scroll zone
-      startAutoScroll("right");
+    if (relativeX < centerZoneStart) {
+      // Left scroll zone - scroll left to see previous items
+      const intensity = 1 - relativeX / centerZoneStart; // Closer to edge = faster
+      const speed = Math.max(2, Math.min(8, intensity * 8));
+      startAutoScroll("left", speed);
+    } else if (relativeX > centerZoneEnd) {
+      // Right scroll zone - scroll right to see next items
+      const intensity = (relativeX - centerZoneEnd) / scrollZoneWidth;
+      const speed = Math.max(2, Math.min(8, intensity * 8));
+      startAutoScroll("right", speed);
     }
+    // Center zone - no auto-scroll
   };
 
   const scrollToCenter = () => {
@@ -325,9 +331,9 @@ const GamePage = () => {
     e.preventDefault();
     dragOverItem.current = targetZoneId;
 
-    // Check for auto-scroll
+    // Handle auto-scroll for desktop
     if (e.clientX) {
-      checkAutoScroll(e.clientX);
+      handleDragPosition(e.clientX);
     }
   };
 
@@ -392,9 +398,9 @@ const GamePage = () => {
     const deltaX = Math.abs(touch.clientX - dragStartPos.current.x);
     const deltaY = Math.abs(touch.clientY - dragStartPos.current.y);
 
-    if (deltaX > 10 || deltaY > 10) {
-      // Check for auto-scroll
-      checkAutoScroll(touch.clientX);
+    if (deltaX > 5 || deltaY > 5) {
+      // Handle auto-scroll based on touch position
+      handleDragPosition(touch.clientX);
     }
   };
 
@@ -433,17 +439,28 @@ const GamePage = () => {
 
   // Global touch move handler to prevent scrolling during drag
   useEffect(() => {
-    const handleGlobalTouchMove = (e) => {
-      if (isDraggingRef.current) {
-        e.preventDefault();
+    const handleGlobalMouseMove = (e) => {
+      if (isDraggingRef.current && window.innerWidth <= 768) {
+        handleDragPosition(e.clientX);
       }
     };
 
+    const handleGlobalTouchMove = (e) => {
+      if (isDraggingRef.current) {
+        e.preventDefault();
+        if (e.touches[0]) {
+          handleDragPosition(e.touches[0].clientX);
+        }
+      }
+    };
+
+    document.addEventListener("mousemove", handleGlobalMouseMove);
     document.addEventListener("touchmove", handleGlobalTouchMove, {
       passive: false,
     });
 
     return () => {
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
       document.removeEventListener("touchmove", handleGlobalTouchMove);
     };
   }, []);

@@ -514,29 +514,54 @@
     display: none;
   }
 
-  /* Auto-scroll zones indicators */
+  /* Auto-scroll zones indicators - IMPROVED */
   .drop-zones::before,
   .drop-zones::after {
     content: "";
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 25%;
+    width: 30%;
     pointer-events: none;
     z-index: 1;
     transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .drop-zones.dragging-active::before,
+  .drop-zones.dragging-active::after {
+    opacity: 1;
   }
 
   .drop-zones::before {
     left: 0;
-    background: linear-gradient(to right, rgba(255, 107, 107, 0.15), transparent);
+    background: linear-gradient(to right, rgba(255, 107, 107, 0.2), rgba(255, 107, 107, 0.05));
     border-radius: 15px 0 0 15px;
   }
 
   .drop-zones::after {
     right: 0;
-    background: linear-gradient(to left, rgba(255, 107, 107, 0.15), transparent);
+    background: linear-gradient(to left, rgba(255, 107, 107, 0.2), rgba(255, 107, 107, 0.05));
     border-radius: 0 15px 15px 0;
+  }
+
+  /* Add pulsing animation for active scroll zones */
+  @keyframes scrollZonePulse {
+    0%,
+    100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .drop-zones.scrolling-left::before {
+    animation: scrollZonePulse 1s ease-in-out infinite;
+  }
+
+  .drop-zones.scrolling-right::after {
+    animation: scrollZonePulse 1s ease-in-out infinite;
   }
 
   .drop-zone {
